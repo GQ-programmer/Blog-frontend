@@ -165,6 +165,7 @@ import Carousel from "../components/Carousel.vue";
 import {message} from 'ant-design-vue';
 import {onMounted, reactive, ref, toRaw, UnwrapRef} from "vue";
 import myAxios from "../plugins/myAxios";
+import getCurrentUser from "../plugins/user";
 
 const top = ref<number>(10);
 const bottom = ref<number>(10);
@@ -192,13 +193,13 @@ const formState: UnwrapRef<FormState> = reactive({
 
 
 onMounted(async () => {
-  const res = await myAxios.get('/user/current');
-  if (res.code === 0 && res.data !== null) {
-    user.value = res.data
-    message.success("获取用户信息成功");
+  const currentUser = await getCurrentUser()
+  if (currentUser !== null) {
+    user.value = currentUser
+    // message.success("获取用户信息成功");
   } else {
     user.value = null
-    message.error("获取用户信息失败");
+    message.warn("登录后体验会更好哦!");
   }
   await doListData();
 
@@ -223,7 +224,7 @@ const login = async () => {
   const res = await myAxios.post('/user/login', formState);
   if (res.code === 0 && res.data !== null) {
     user.value = res.data
-    message.success("登录成功!");
+    message.success("登录成功！");
     //关闭模态框
     visible.value = false;
   } else {
@@ -236,7 +237,7 @@ const confirm = async (e: MouseEvent) => {
   const res = await myAxios.post('/user/logOut');
   if (res.code === 0 && res.data !== null) {
     user.value = null
-    message.success("退出成功!");
+    message.success("退出成功！");
   } else {
     message.error(`${res.description}`);
   }
@@ -252,7 +253,7 @@ const showModal = () => {
 
 
 const warning = () => {
-  message.warning('暂无后台,等待后续版本');
+  message.warning('暂无后台，等待后续版本');
 };
 
 </script>
@@ -277,20 +278,18 @@ const warning = () => {
 }
 
 .a-col-right2 {
-  border: #eeecec solid 1px;
   background-color: white;
-  box-shadow: 15px 15px 20px -30PX black;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
   margin-left: 20px;
   height: 240px;
   padding: 10px;
 }
 
 .a-col-left {
-  border: #eeecec solid 1px;
   background-color: white;
   margin-left: 0px;
   padding: 20px;
-  box-shadow: 15px 15px 20px -30PX black;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
 }
 
 .login-form {

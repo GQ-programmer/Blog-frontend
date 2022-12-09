@@ -1,20 +1,58 @@
 <template>
   <div class="post-edit-container">
+    <div class="pageHeader">
+      <div style="float: left;margin-left: 15px" @click="back()">
+        <a style="color: black">
+          <left-outlined style="font-size: 25px;margin-top: 18px"/>
+        </a>
+      </div>
+      <div style="float: left;font-size:18px;margin-top: 15px;margin-left: 5px" >
+        <div style="display: inline;">首页</div>
+      </div>
+      <div style="float: left;margin-top: 20px;margin-left: 120px">
+        文章标题：
+      </div>
+      <div style="float: left; width: 50%;margin-top: 16px;">
+        <a-input
+            v-model:value="formState.title"
+            style="border-radius: 20px"
+            placeholder="请输入文章标题（5~30字）"
+        />
+      </div>
+      <div style="float:left;margin-top:18px;margin-left:10px;font-size: 16px">
+        <span>{{formState.title.length}}</span>/30
+      </div>
+      <div style="float: right;margin-top: 14px;margin-right: 40px">
+        <a-avatar :size="35" :src="userAvatarUrl" />
+      </div>
+      <div style="float: right;margin-top: 16px;margin-right: 40px">
+        <a-button type="primary" shape="round" @click="showModal">发布文章</a-button>
+      </div>
+
+    </div>
     <v-md-editor
-        :include-level="[1,2,3,4]"
+        class="v-md-editor"
         v-model="text"
+        :include-level="[1,2,3,4]"
         height="680px"
         :disabled-menus="[]"
         default-show-toc="true"
+        @upload-image="handleUploadImage"
         @copy-code-success="handleCopyCodeSuccess"
-    ></v-md-editor>
+    >
+    </v-md-editor>
   </div>
   <div>
-    <a-button class="submit-btn" type="primary" shape="circle" @click="showModal">
-      <template #icon><check-outlined /></template>
-    </a-button>
+<!--  发布文章悬浮按钮  淘汰-->
+<!--    <a-button class="submit-btn" type="primary" shape="circle" @click="showModal">-->
+<!--      <template #icon>-->
+<!--        <check-outlined/>-->
+<!--      </template>-->
+<!--    </a-button>-->
+  </div>
 
-    <a-modal v-model:visible="visible" width="700px" :maskClosable="false" ok-text="发布文章"
+<!--    // 发布文章模态框-->
+    <a-modal v-model:visible="visible" width="700px" :closable="false" :maskClosable="false" ok-text="发布文章"
              cancel-text="取消" title="发布文章" :footer="null">
 
       <a-form :model="formState"
@@ -35,7 +73,7 @@
             label="摘要"
             :rules="[{ required: true, message: '请输入文章摘要!' }]"
         >
-          <a-textarea v-model:value="formState.description" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过20字)" />
+          <a-textarea v-model:value="formState.description" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过20字)"/>
         </a-form-item>
 
         <a-form-item
@@ -51,7 +89,7 @@
               :customRequest="doUpload"
               :before-upload="beforeUpload"
           >
-            <img v-if="imageUrl" style="width: 100%" :src="`${imageUrl}`" alt="avatar" />
+            <img v-if="imageUrl" style="width: 100%" :src="`${imageUrl}`" alt="avatar"/>
             <div v-else>
               <a-spin v-if="spinning" tip="UpLoading..." :spinning="spinning"/>
               <plus-outlined v-else></plus-outlined>
@@ -60,10 +98,12 @@
         </a-form-item>
         <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
           <a-button style="margin-left: 40px" @click="closeModal">取消</a-button>
-          <a-button style="margin-left: 20px" type="primary"  html-type="submit" @click="doPublish">发布文章</a-button>
+          <a-button style="margin-left: 20px" type="primary" html-type="submit" @click="doPublish">发布文章</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
+<!--    是否前往首页模态框-->
+<!--    todo 后期优化是否前往文章详情页-->
     <a-modal
         v-model:visible="confirmVisible"
         title="Modal"
@@ -73,76 +113,37 @@
     >
       <p>是否前往首页...</p>
     </a-modal>
-  </div>
-
 </template>
 
 <script setup lang="ts">
-import { PlusOutlined } from '@ant-design/icons-vue';
-import {createVNode, getCurrentInstance, reactive, ref} from "vue";
-import {CheckOutlined} from '@ant-design/icons-vue';
-import {Form, message,Modal , UploadProps} from "ant-design-vue";
-import { v4 as uuidv4 } from 'uuid';
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import {PlusOutlined} from '@ant-design/icons-vue';
+import {createVNode, getCurrentInstance, onMounted, reactive, ref} from "vue";
+import {CheckOutlined,LeftOutlined } from '@ant-design/icons-vue';
+import {Form, message, Modal, UploadProps} from "ant-design-vue";
+import {v4 as uuidv4} from 'uuid';
+import {ExclamationCircleOutlined} from '@ant-design/icons-vue';
 
 import COS from 'cos-js-sdk-v5';
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import myAxios from "../plugins/myAxios";
+import getCOS from "../config/getcosobj";
+
 
 const useForm = Form.useForm;
 const top = ref<number>(10);
 const bottom = ref<number>(10);
 const visible = ref<boolean>(false);
 const confirmVisible = ref<boolean>(false);
-const labelCol = { style: { width: '150px' }}
-const wrapperCol = { span: 14 }
+const labelCol = {style: {width: '150px'}}
+const wrapperCol = {span: 14}
 
 const fileList = ref([]);
 const loading = ref<boolean>(false);
 const imageUrl = ref<string>('');
 const spinning = ref<boolean>(false)
-
+const userAvatarUrl = ref<string>('')
 const router = useRouter();
-
-const getCOS = () => {
-  // 初始化实例
-  var cos = new COS({
-    // getAuthorization 必选参数
-    getAuthorization: function (options, callback) {
-      // 初始化时不会调用，只有调用cos方法（比如cos.putObject）时才会进入
-      // 异步获取临时密钥
-      // 服务端 JS 和 PHP 例子：https://github.com/tencentyun/cos-js-sdk-v5/blob/master/server/
-      // 服务端其他语言参考 COS STS SDK ：https://github.com/tencentyun/qcloud-cos-sts-sdk
-      // STS 详细文档指引看：https://cloud.tencent.com/document/product/436/14048
-
-      var url = 'http://127.0.0.1:8080/api/cos/getCredential'; // url替换成您自己的后端服务
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      // xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-      xhr.onload = function (e) {
-        try {
-          var data = JSON.parse(e.target.responseText);
-          var credentials = data.credentials;
-        } catch (e) {
-        }
-        if (!data || !credentials) {
-          return console.error('credentials invalid:\n' + JSON.stringify(data, null, 2))
-        };
-        callback({
-          TmpSecretId: credentials.tmpSecretId,
-          TmpSecretKey: credentials.tmpSecretKey,
-          SecurityToken: credentials.sessionToken,
-          // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
-          StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
-          ExpiredTime: data.expiredTime, // 时间戳，单位秒，如：1580000000
-        });
-      };
-      xhr.send();
-    }
-  });
-  return cos;
-}
-
+const route = useRoute();
 
 const formState = reactive({
   title: '',
@@ -151,8 +152,49 @@ const formState = reactive({
 
 const text = ref('')
 
-const handleCopyCodeSuccess = (code) => {
-  console.log(code)
+const back = () => {
+  router.back();
+}
+let { proxy } = getCurrentInstance()
+onMounted(() => {
+  userAvatarUrl.value = route.query.userAvatarUrl as string
+})
+/**
+ * 文章编辑器上传本地文件到服务器COS
+ * @param event
+ * @param insertImage
+ * @param files
+ */
+const handleUploadImage = (event, insertImage, files) => {
+  // 拿到 files 之后上传到文件服务器，然后向编辑框中插入对应的内容
+  console.log(files);
+  let imgUrl_suffix = files[0].name.split('.')[1];
+  let cos = getCOS();
+  cos.putObject({
+    Bucket: 'zgq-icu-2002-1313043931', /* 填入您自己的存储桶，必须字段 */
+    Region: 'ap-shanghai',  /* 存储桶所在地域，例如ap-beijing，必须字段 */
+    Key: uuidv4() + '.' + imgUrl_suffix,  /* 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段 */
+    Body: files[0], /* 必须，上传文件对象，可以是input[type="file"]标签选择本地文件后得到的file对象 */
+    onProgress: function (progressData) {
+      console.log(JSON.stringify(progressData));
+    }
+  }, function (err, data) {
+    console.log(err || data);
+    if (err) {
+      message.warning("上传失败!")
+    } else {
+      // 保存图片上传地址
+      console.log('https://' + data.Location);
+      // 此处只做示例
+      insertImage({
+        url: 'https://' + data.Location,
+        desc: '',
+        width: '200',
+        height: 'auto',
+      });
+    }
+  });
+
 }
 
 const showModal = () => {
@@ -162,7 +204,6 @@ const showModal = () => {
 /**
  *  取消发布
  */
-let {proxy} = getCurrentInstance();
 const closeModal = () => {
   // 清空表单
   proxy.$refs['formRef'].resetFields();
@@ -173,7 +214,7 @@ const showConfirm = () => {
   Modal.confirm({
     title: '是否前往首页?',
     icon: createVNode(ExclamationCircleOutlined),
-    content: createVNode('div', { style: 'color:gray;' }, '否：再写一篇'),
+    content: createVNode('div', {style: 'color:gray;'}, '否：再写一篇'),
     okText: '是',
     cancelText: '否',
     onOk() {
@@ -190,14 +231,14 @@ const showConfirm = () => {
 /**
  *  发布文章
  */
-const doPublish = async () =>{
+const doPublish = async () => {
   // 校验文章内容是否过短
   if (text.value.length < 30) {
     message.warning('文章内容过短,需超过30字!')
     return;
   }
   // 校验图片是否上传
-  if (imageUrl.value == ''){
+  if (imageUrl.value == '') {
     message.warning('未上传图片!')
     return;
   }
@@ -213,7 +254,7 @@ const doPublish = async () =>{
     return;
   }
 
-  const res = await myAxios.post('/article/add',{
+  const res = await myAxios.post('/article/add', {
     title: formState.title,
     description: formState.description,
     coverUrl: imageUrl.value,
@@ -232,30 +273,30 @@ const doPublish = async () =>{
 }
 
 /**
- * 上传图片到COS（自定义上传方法）
+ * 上传文章封面图片到COS（自定义上传方法）
  * @param data
  */
-const doUpload = (data:File) => {
+const doUpload = (data: File) => {
   // 将imgUrl置空
   imageUrl.value = '';
   spinning.value = true;
-  console.log(data);
+  console.log(data.file);
   let imgUrl_suffix = data.file.name.split('.')[1];
   let cos = getCOS();
   cos.putObject({
     Bucket: 'zgq-icu-2002-1313043931', /* 填入您自己的存储桶，必须字段 */
     Region: 'ap-shanghai',  /* 存储桶所在地域，例如ap-beijing，必须字段 */
-    Key: uuidv4()+'.'+imgUrl_suffix,  /* 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段 */
+    Key: uuidv4() + '.' + imgUrl_suffix,  /* 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段 */
     Body: data.file, /* 必须，上传文件对象，可以是input[type="file"]标签选择本地文件后得到的file对象 */
-    onProgress: function(progressData) {
+    onProgress: function (progressData) {
       console.log(JSON.stringify(progressData));
     }
-  }, function(err, data) {
+  }, function (err, data) {
     console.log(err || data);
     if (err) {
       spinning.value = false;
       message.warning("上传失败!")
-    }else {
+    } else {
       spinning.value = false;
       message.success("上传成功!")
       // 保存图片上传地址
@@ -263,8 +304,8 @@ const doUpload = (data:File) => {
       imageUrl.value = 'https://' + data.Location;
     }
   });
-
 }
+
 /**
  * 图片上传前的校验
  * @param file
@@ -279,19 +320,37 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
     message.error('文件大小超过 2MB!');
   }
   return isJpgOrPng && isLt2M;
-};
+}
 
 </script>
 
 <style scoped>
-.post-edit-container{
-  margin: 20px auto 0;
+.post-edit-container {
+  margin: 13px auto 0;
   width: 90%;
 }
-.submit-btn{
+
+.submit-btn {
   position: fixed;
   right: 20px;
   bottom: 50px;
-  width: 45px;height: 45px
+  width: 45px;
+  height: 45px
 }
+.pageHeader{
+  background-color: white;
+  height: 60px;
+  margin-bottom: 10px;
+  margin-left: 0px;
+}
+>>>.v-md-editor {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 0px;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+}
+
 </style>

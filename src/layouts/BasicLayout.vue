@@ -42,15 +42,21 @@
 </template>
 <script lang="ts" setup>
 import logo from '../assets/logo.png'
-import {defineComponent, onMounted, ref, toRaw, watchEffect} from 'vue';
+import {defineComponent, getCurrentInstance, onMounted, ref, toRaw, watchEffect} from 'vue';
 import { HomeOutlined, FileMarkdownOutlined,UserOutlined } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
+import myAxios from "../plugins/myAxios";
+import {message} from "ant-design-vue";
+import getCurrentUser from "../plugins/user";
 const router = useRouter()
 const route = useRoute();
-const user = ref({})
+
 
 const current = ref<string[]>(['index']);
 
+/**
+ * 根据路由 展示导航item active状态
+ */
 watchEffect(() =>{
   const path = route.path;
   console.log(path)
@@ -59,14 +65,37 @@ watchEffect(() =>{
   }else if (path === '/postEdit'){
     current.value = ['postEdit'];
   }else {
+    // none都未选中
     current.value = ['none'];
   }
 })
-const doPostEdit = () => {
-  router.push('/postEdit')
+
+/**
+ * 点击发布文章事件
+ */
+const doPostEdit = async () => {
+  console.log( "@@@"+route.fullPath)
+  const currentUser = await getCurrentUser();
+  if (currentUser === null) {
+    message.error("你还未登录！");
+    // 解决导航栏active问题
+    if (route.path === '/'){
+      current.value = ['index'];
+    }else {
+      current.value = ['none'];
+    }
+    //
+    return;
+  }else {
+    router.push({
+      path:'/postEdit',
+      query:{userAvatarUrl:currentUser.avatarUrl}
+    })
+  }
 }
 const onSearch = () => {
-  alert(toRaw(router).currentRoute.value.path)
+  // alert(toRaw(router).currentRoute.value.path)
+  message.warn("暂未实现，等待后续版本!")
 }
 </script>
 
