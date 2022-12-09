@@ -50,9 +50,8 @@
               :show-upload-list="false"
               :customRequest="doUpload"
               :before-upload="beforeUpload"
-              @change="handleChange"
           >
-            <img v-if="imageUrl" style="width: 100%" :src="`https://${imageUrl}`" alt="avatar" />
+            <img v-if="imageUrl" style="width: 100%" :src="`${imageUrl}`" alt="avatar" />
             <div v-else>
               <a-spin v-if="spinning" tip="UpLoading..." :spinning="spinning"/>
               <plus-outlined v-else></plus-outlined>
@@ -260,8 +259,8 @@ const doUpload = (data:File) => {
       spinning.value = false;
       message.success("上传成功!")
       // 保存图片上传地址
-      console.log(data.Location);
-      imageUrl.value = data.Location;
+      console.log('https://' + data.Location);
+      imageUrl.value = 'https://' + data.Location;
     }
   });
 

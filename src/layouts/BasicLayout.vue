@@ -7,36 +7,18 @@
     <div style="display: inline;float: right;margin-left: 50px">
         <a-menu v-model:selectedKeys="current" style=" " mode="horizontal">
 
-        <a-menu-item  key="mail" style="padding-bottom: 8px">
+        <a-menu-item  key="index"    style="padding-bottom: 8px">
           <template #icon>
             <home-outlined />
           </template>
           <router-link to="/">首页</router-link>
         </a-menu-item>
-        <a-menu-item key="app" @click="doPostEdit()">
+        <a-menu-item key="postEdit" @click="doPostEdit()">
           <template #icon>
             <file-markdown-outlined />
           </template>
           发布文章
         </a-menu-item>
-<!--        <a-sub-menu>-->
-<!--          <template #icon>-->
-
-<!--          </template>-->
-<!--          <template #title>-->
-<!--            <a-avatar src="https://joeschmoe.io/api/v1/random" />-->
-<!--            个人中心-->
-<!--          </template>-->
-<!--          <a-menu-item key="setting:1">-->
-<!--            <router-link to="/user/info">个人信息</router-link>-->
-<!--          </a-menu-item>-->
-<!--          <a-menu-item>-->
-<!--            <router-link to="/user/edit">个人设置</router-link></a-menu-item>-->
-<!--          <a-menu-item key="setting:2">-->
-<!--            <router-link to="/user/login">退出登录</router-link>-->
-<!--          </a-menu-item>-->
-<!--        </a-sub-menu>-->
-
       </a-menu>
     </div>
     <div style="display: inline;float: right">
@@ -60,13 +42,26 @@
 </template>
 <script lang="ts" setup>
 import logo from '../assets/logo.png'
-import {defineComponent, ref, toRaw} from 'vue';
+import {defineComponent, onMounted, ref, toRaw, watchEffect} from 'vue';
 import { HomeOutlined, FileMarkdownOutlined,UserOutlined } from '@ant-design/icons-vue';
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 const router = useRouter()
+const route = useRoute();
 const user = ref({})
 
-const current = ref<string[]>(['mail']);
+const current = ref<string[]>(['index']);
+
+watchEffect(() =>{
+  const path = route.path;
+  console.log(path)
+  if (path === '/'){
+    current.value = ['index'];
+  }else if (path === '/postEdit'){
+    current.value = ['postEdit'];
+  }else {
+    current.value = ['none'];
+  }
+})
 const doPostEdit = () => {
   router.push('/postEdit')
 }

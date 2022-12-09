@@ -14,14 +14,14 @@
               <a-list-item key="item.title">
                 <template #actions>
                   发布时间：{{
-                    dayjs(item.updatetime).format('YYYY-MM-DD HH:mm:ss')
+                    dayjs(item.updateTime).format('YYYY-MM-DD HH:mm:ss')
                   }}
                 </template>
                 <template #extra>
                   <img
                       width="210"
                       alt="logo"
-                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                      :src="`${item.coverUrl}`"
                   />
                 </template>
                 <a-list-item-meta :description="`作者：${item.createUser.username}`">
