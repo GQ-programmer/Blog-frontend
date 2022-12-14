@@ -1,44 +1,48 @@
 <template>
-  <div class="header">
-    <div style="display: inline">
-      <img :src="logo"  style="width: 150px;margin-top: 7px">
+  <div class="container">
+
+    <div class="header">
+      <div style="float: left">
+        <img :src="logo"  style="width: 150px;margin-top: 7px">
+      </div>
+
+      <div style="float: left; margin-left: 177px;">
+        <a-input-search
+            style="width: 250px;margin-top:10px"
+            v-model:value="value"
+            v-if="toRaw(router).currentRoute.value.path === '/'"
+            placeholder="搜索文章"
+            enter-button
+            @search="onSearch"
+        />
+      </div>
+
+      <div style="float: right;margin-left: 50px">
+          <a-menu v-model:selectedKeys="current" style=" " mode="horizontal">
+
+          <a-menu-item  key="index"    style="padding-bottom: 8px">
+            <template #icon>
+              <home-outlined />
+            </template>
+            <router-link to="/">首页</router-link>
+          </a-menu-item>
+          <a-menu-item key="postEdit" @click="doPostEdit()">
+            <template #icon>
+              <file-markdown-outlined />
+            </template>
+            发布文章
+          </a-menu-item>
+        </a-menu>
+      </div>
+
     </div>
 
-    <div style="display: inline;float: right;margin-left: 50px">
-        <a-menu v-model:selectedKeys="current" style=" " mode="horizontal">
+  <!--  <div style="width: 100%;height: 50px"></div>-->
+    <div class="content">
+        <router-view/>
 
-        <a-menu-item  key="index"    style="padding-bottom: 8px">
-          <template #icon>
-            <home-outlined />
-          </template>
-          <router-link to="/">首页</router-link>
-        </a-menu-item>
-        <a-menu-item key="postEdit" @click="doPostEdit()">
-          <template #icon>
-            <file-markdown-outlined />
-          </template>
-          发布文章
-        </a-menu-item>
-      </a-menu>
-    </div>
-    <div style="display: inline;float: right">
-      <a-input-search
-          style="width: 250px;margin-top:10px"
-          v-model:value="value"
-          v-if="toRaw(router).currentRoute.value.path === '/'"
-          placeholder="搜索关键词"
-          enter-button
-          @search="onSearch"
-      />
     </div>
   </div>
-
-<!--  <div style="width: 100%;height: 50px"></div>-->
-  <div class="content">
-      <router-view/>
-  </div>
-
-
 </template>
 <script lang="ts" setup>
 import logo from '../assets/logo.png'
@@ -59,10 +63,11 @@ const current = ref<string[]>(['index']);
  */
 watchEffect(() =>{
   const path = route.path;
+  var patt= /^\/postEdit/g;
   console.log(path)
   if (path === '/'){
     current.value = ['index'];
-  }else if (path === '/postEdit'){
+  }else if (patt.test(path)){
     current.value = ['postEdit'];
   }else {
     // none都未选中
@@ -84,12 +89,13 @@ const doPostEdit = async () => {
     }else {
       current.value = ['none'];
     }
-    //
+
     return;
   }else {
+    current.value = ['postEdit'];
     router.push({
-      path:'/postEdit',
-      query:{userAvatarUrl:currentUser.avatarUrl}
+      name:'PostEdit',
+      params:{articleId: 0}
     })
   }
 }
@@ -108,6 +114,7 @@ const onSearch = () => {
   background-color: white;
   padding: 10px 9% 0px;
   box-shadow: 0px 13px 10px -15px #1890ff;
+  min-width: 1047px;
 }
 .header-title{
   color:black;

@@ -5,6 +5,7 @@ import 'ant-design-vue/dist/antd.css';
 import routes from "./config/route";
 import * as VueRouter from "vue-router";
 import mitt from 'mitt' // 导入mitt
+import'./global.css'
 
 //引入v-md-editor编辑器
 import VueMarkdownEditor from '@kangc/v-md-editor';
@@ -56,6 +57,7 @@ const router = VueRouter.createRouter({
 
 
 const app = createApp(App)
+
 app.config.globalProperties.$mitt = mitt() // mitt在vue3中挂载到全局
 app.use(Antd)
 app.use(router)

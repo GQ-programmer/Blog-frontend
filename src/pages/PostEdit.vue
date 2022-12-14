@@ -23,7 +23,7 @@
         <span>{{formState.title.length}}</span>/30
       </div>
       <div style="float: right;margin-top: 14px;margin-right: 40px">
-        <a-avatar :size="35" :src="userAvatarUrl" />
+        <a-avatar :size="35" v-if="user.avatarUrl !== ''" :src="user.avatarUrl" />
       </div>
       <div style="float: right;margin-top: 16px;margin-right: 40px">
         <a-button type="primary" shape="round" @click="showModal">发布文章</a-button>
@@ -53,7 +53,7 @@
 
 <!--    // 发布文章模态框-->
     <a-modal v-model:visible="visible" width="700px" :closable="false" :maskClosable="false" ok-text="发布文章"
-             cancel-text="取消" title="发布文章" :footer="null">
+             title="发布文章" :footer="null">
 
       <a-form :model="formState"
               name="basic"
@@ -73,7 +73,7 @@
             label="摘要"
             :rules="[{ required: true, message: '请输入文章摘要!' }]"
         >
-          <a-textarea v-model:value="formState.description" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过20字)"/>
+          <a-textarea v-model:value="formState.description" style="height: 100px" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过20字)"/>
         </a-form-item>
 
         <a-form-item
@@ -97,8 +97,8 @@
           </a-upload>
         </a-form-item>
         <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-          <a-button style="margin-left: 40px" @click="closeModal">取消</a-button>
-          <a-button style="margin-left: 20px" type="primary" html-type="submit" @click="doPublish">发布文章</a-button>
+          <a-button style="margin-left: 40px" shape="round" @click="closeModal">取消</a-button>
+          <a-button style="margin-left: 20px" type="primary" shape="round" html-type="submit" @click="doPublish">发布文章</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -116,17 +116,18 @@
 </template>
 
 <script setup lang="ts">
-import {PlusOutlined} from '@ant-design/icons-vue';
-import {createVNode, getCurrentInstance, onMounted, reactive, ref} from "vue";
+import {PlusOutlined,SmileOutlined} from '@ant-design/icons-vue';
+import {createVNode, getCurrentInstance, h, onMounted, reactive, ref} from "vue";
 import {CheckOutlined,LeftOutlined } from '@ant-design/icons-vue';
-import {Form, message, Modal, UploadProps} from "ant-design-vue";
+import {Form, message, Modal, notification, UploadProps} from "ant-design-vue";
 import {v4 as uuidv4} from 'uuid';
-import {ExclamationCircleOutlined} from '@ant-design/icons-vue';
+import {ExclamationCircleOutlined, CheckCircleOutlined} from '@ant-design/icons-vue';
+import type { NotificationPlacement } from 'ant-design-vue';
 
-import COS from 'cos-js-sdk-v5';
 import {useRoute, useRouter} from "vue-router";
 import myAxios from "../plugins/myAxios";
 import getCOS from "../config/getcosobj";
+import getCurrentUser from "../plugins/user";
 
 
 const useForm = Form.useForm;
@@ -141,24 +142,55 @@ const fileList = ref([]);
 const loading = ref<boolean>(false);
 const imageUrl = ref<string>('');
 const spinning = ref<boolean>(false)
-const userAvatarUrl = ref<string>('')
+
+let { proxy } = getCurrentInstance()
 const router = useRouter();
 const route = useRoute();
+const user = ref({})
+const text = ref('')
+const isReEdit = ref(false)
+const articleId = ref(0)
 
 const formState = reactive({
   title: '',
   description: '',
 });
 
-const text = ref('')
+
+onMounted(async ()=> {
+    let id = route.params.articleId;
+    articleId.value = Number(id)
+    if (id === '0') {
+      // 发布文章
+      openNotification('topLeft');
+      const currentUser = await getCurrentUser()
+      if (currentUser !== null) {
+        user.value = currentUser;
+      }
+    } else {
+      // 重新编辑文章
+      const res = await myAxios.get('/article/get', {
+        params:{
+          articleId:articleId.value
+        }
+      })
+      if (res.code === 0 && res.data !== null) {
+        const article = res.data
+        user.value = article.createUser
+        text.value = article.content
+        formState.title = article.title
+        formState.description = article.description
+        imageUrl.value = article.coverUrl
+        isReEdit.value = true
+      }
+    }
+
+})
 
 const back = () => {
   router.back();
 }
-let { proxy } = getCurrentInstance()
-onMounted(() => {
-  userAvatarUrl.value = route.query.userAvatarUrl as string
-})
+
 /**
  * 文章编辑器上传本地文件到服务器COS
  * @param event
@@ -197,6 +229,23 @@ const handleUploadImage = (event, insertImage, files) => {
 
 }
 
+/**
+ * 首次进入文章编辑弹出提示
+ */
+const openNotification = (placement: NotificationPlacement) => {
+  notification.open({
+    message: '温馨提示：',
+    description:
+        '文章内容超过30字，才可进行发布哦!',
+    placement ,
+    onClick: () => {
+      console.log('Notification Clicked!');
+    },
+    icon: () => h(SmileOutlined, { style: 'color: #108ee9' }),
+
+  });
+};
+
 const showModal = () => {
   visible.value = true;
 };
@@ -210,11 +259,11 @@ const closeModal = () => {
   imageUrl.value = '';
   visible.value = false;
 };
-const showConfirm = () => {
+const showConfirm = (title:string) => {
   Modal.confirm({
-    title: '是否前往首页?',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: createVNode('div', {style: 'color:gray;'}, '否：再写一篇'),
+    title: title,
+    icon: createVNode(CheckCircleOutlined),
+    // content: createVNode('div', {style: 'color:gray;'}, '否：再写一篇'),
     okText: '是',
     cancelText: '否',
     onOk() {
@@ -223,6 +272,13 @@ const showConfirm = () => {
     onCancel() {
       console.log('否');
       text.value = '';
+      formState.title = '';
+      formState.description = '';
+      imageUrl.value = '';
+      router.replace({
+        name:"PostEdit",
+        params:{articleId:0}
+      })
     },
     class: 'isGoIndex',
   });
@@ -253,23 +309,38 @@ const doPublish = async () => {
     message.warning('文章摘要过短,需超过20字!')
     return;
   }
-
-  const res = await myAxios.post('/article/add', {
-    title: formState.title,
-    description: formState.description,
-    coverUrl: imageUrl.value,
-    content: text.value
-  })
-  if (res.code === 0 && res.data !== null) {
-    message.success("发布成功!");
-    proxy.$refs['formRef'].resetFields();
-    imageUrl.value = '';
-    visible.value = false;
-    showConfirm();
-  } else {
-    message.error(`${res.description}`);
+  if (isReEdit.value) {
+    const res = await myAxios.post('/article/update', {
+      id: articleId.value,
+      title: formState.title,
+      description: formState.description,
+      coverUrl: imageUrl.value,
+      content: text.value
+    })
+    if (res.code === 0 && res.data !== null) {
+      proxy.$refs['formRef'].resetFields();
+      imageUrl.value = '';
+      visible.value = false;
+      showConfirm("更新成功，是否前往主页？");
+    } else {
+      message.error(`${res.description}`);
+    }
+  }else {
+    const res = await myAxios.post('/article/add', {
+      title: formState.title,
+      description: formState.description,
+      coverUrl: imageUrl.value,
+      content: text.value
+    })
+    if (res.code === 0 && res.data !== null) {
+      proxy.$refs['formRef'].resetFields();
+      imageUrl.value = '';
+      visible.value = false;
+      showConfirm("发布成功，是否前往主页？");
+    } else {
+      message.error(`${res.description}`);
+    }
   }
-
 }
 
 /**
@@ -329,7 +400,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   margin: 13px auto 0;
   width: 90%;
 }
-
+/* 被弃用*/
 .submit-btn {
   position: fixed;
   right: 20px;
@@ -342,15 +413,18 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   height: 60px;
   margin-bottom: 10px;
   margin-left: 0px;
+  min-width: 1085px;
 }
->>>.v-md-editor {
+/* 覆盖v-md-editor默认样式 */
+:deep(.v-md-editor) {
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
   width: 100%;
   background-color: #fff;
   border-radius: 0px;
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  box-shadow: 0 0 ;
+  min-width: 1085px;
 }
 
 </style>
