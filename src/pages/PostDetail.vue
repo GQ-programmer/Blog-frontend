@@ -60,7 +60,7 @@
         <div style="text-align: center;margin-top: 18px;">
           <a-space :size="20">
             <a-button shape="round"  @click="doUserInfo(articleVo.createUser.id)">主页</a-button>
-            <a-button shape="round">私信</a-button>
+            <a-button shape="round" @click="()=> {message.warn('暂未实现！')}">私信</a-button>
           </a-space>
         </div>
       </div>
@@ -129,7 +129,7 @@ import getCurrentUser from "../plugins/user";
 const route = useRoute()
 const router = useRouter()
 const articleVo = ref()
-const currentUser = ref()
+const currentUser = ref({})
 const isShow = ref(false)
 
 const {proxy}: any = getCurrentInstance() as ComponentInternalInstance;
@@ -167,7 +167,7 @@ onMounted( async () => {
   })
   if (res.code === 0 && res.data !== null){
       articleVo.value = res.data;
-      console.log(articleVo.value)
+      // console.log(articleVo.value)
   }else {
     console.log("请求数据出错!")
     isShow.value = true
@@ -229,9 +229,11 @@ function handleAnchorClick(anchor: any) {
   width: 600px;
   float: left;
   margin-bottom: 10px;
+  border-radius: 4px;
 }
 
 .v-md-preview {
+  border-radius: 4px;
   float: left;
   width: 650px;
   background-color: white;
@@ -252,7 +254,6 @@ function handleAnchorClick(anchor: any) {
 
 .detail-right .two {
   background-color: white;
-
   margin-bottom: 16px;
 }
 

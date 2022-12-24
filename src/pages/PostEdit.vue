@@ -34,7 +34,7 @@
         class="v-md-editor"
         v-model="text"
         :include-level="[1,2,3,4]"
-        height="680px"
+        height="82vh"
         :disabled-menus="[]"
         default-show-toc="true"
         @upload-image="handleUploadImage"
@@ -73,7 +73,7 @@
             label="摘要"
             :rules="[{ required: true, message: '请输入文章摘要!' }]"
         >
-          <a-textarea v-model:value="formState.description" style="height: 100px" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过20字)"/>
+          <a-textarea v-model:value="formState.description" style="height: 100px" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过10字)"/>
         </a-form-item>
 
         <a-form-item
@@ -305,8 +305,8 @@ const doPublish = async () => {
     return;
   }
   // 校验文章摘要
-  if (formState.description.length < 20) {
-    message.warning('文章摘要过短,需超过20字!')
+  if (formState.description.length < 10) {
+    message.warning('文章摘要过短,需超过10字!')
     return;
   }
   if (isReEdit.value) {
@@ -409,6 +409,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   height: 45px
 }
 .pageHeader{
+  border-radius: 4px;
   background-color: white;
   height: 60px;
   margin-bottom: 10px;
@@ -422,7 +423,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   display: flex;
   width: 100%;
   background-color: #fff;
-  border-radius: 0px;
+  border-radius: 4px;
   box-shadow: 0 0 ;
   min-width: 1085px;
 }

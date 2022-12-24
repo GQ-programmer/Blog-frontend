@@ -129,7 +129,7 @@
                   </a-form-item>
                   出生日期
                     <a-form-item name="birthday" :rules="[{ type: 'string' , required: true, message: '请选择日期!' }]">
-                      <a-date-picker  v-model:value="formState.birthday" value-format="YYYY-MM-DD" placeholder="请选者日期"/>
+                      <a-date-picker  v-model:value="formState.birthday" value-format="YYYY-MM-DD" placeholder="请选择日期"/>
                     </a-form-item>
                   所在地区
                   <div>
@@ -334,11 +334,11 @@ const doUpdateUser = async () => {
     message.warn("昵称3~8位!");
     return;
   }
-  if (formState.description.length > 25) {
+  if (formState.description !== null && formState.description.length > 25) {
     message.warn("个性签名小于25位!");
     return;
   }
-  if (formState.area.length > 10) {
+  if (formState.area !== null &&formState.area.length > 10) {
     message.warn("地区小于10位!");
     return;
   }

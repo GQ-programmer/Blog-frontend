@@ -8,29 +8,21 @@ import mitt from 'mitt' // 导入mitt
 import'./global.css'
 
 //引入v-md-editor编辑器
+// @ts-ignore
 import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
 import '@kangc/v-md-editor/lib/theme/style/github.css';
-
+// @ts-ignore
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+// @ts-ignore
 import VMdPreview from '@kangc/v-md-editor/lib/preview';
 import '@kangc/v-md-editor/lib/style/preview.css';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 
 
-// 快捷复制代码
-import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
-import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 
-import VMdPreviewHtml from '@kangc/v-md-editor/lib/preview-html';
-import createCopyCodePreview from '@kangc/v-md-editor/lib/plugins/copy-code/preview';
-
-
-// highlightjs
+// 引入所有语言包
 import hljs from 'highlight.js';
-// 按需引入语言包
-import json from 'highlight.js/lib/languages/json';
 
-hljs.registerLanguage('json', json);
 
 VueMarkdownEditor.use(githubTheme, {
     Hljs: hljs,
@@ -45,8 +37,6 @@ VMdPreview.use(githubTheme, {
     Hljs: hljs,
 });
 
-VMdPreviewHtml.use(createCopyCodePreview());
-VueMarkdownEditor.use(createCopyCodePlugin());
 
 // 创建路由实例并传递 `routes` 配置
 const router = VueRouter.createRouter({

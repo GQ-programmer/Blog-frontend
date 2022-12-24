@@ -5,6 +5,8 @@ import UserInfo from "../pages/UserInfo.vue";
 import UserCenter from "../pages/UserCenter.vue";
 import UserLogin from "../pages/UserLogin.vue";
 import Index from "../pages/Index.vue";
+import SearchPage from "../pages/SearchPage.vue";
+import Error404 from "../pages/error/Error404.vue";
 import getCurrentUser from "../plugins/user";
 import {message} from "ant-design-vue";
 
@@ -28,6 +30,8 @@ const routes = [
     { path: '/user/info/:userId',name:'UserInfo', component: UserInfo },
     { path: '/user/center', component: UserCenter },
     { path: '/user/login', component: UserLogin },
+    { path: '/search/:searchText',name:'SearchPage', component: SearchPage },
+    { path: '/:catchAll(.*)', component:  Error404},
 
 ]
 export default routes;

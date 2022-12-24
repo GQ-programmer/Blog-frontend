@@ -16,7 +16,7 @@
               <a-list-item key="item.title">
                 <template #actions>
                   发布时间：{{
-                    dayjs(item.updateTime).format('YYYY-MM-DD HH:mm:ss')
+                    dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')
                   }}
                 </template>
                 <template #extra>
@@ -40,11 +40,10 @@
             </template>
             <template #footer>
               <div>
-                <b>GQ Blog</b>
-                <a href="#">豫 备案号</a>
                 <a-pagination
                     style="float: right"
                     show-size-changer
+                    size="small"
                     :page-size-options="pageSizeOptions"
                     :show-total="total => `总数 ${totalNum} 条`"
                     @change="doListData()"
@@ -59,6 +58,15 @@
               </div>
             </template>
           </a-list>
+          <div style="height: 40px;margin-top: 68px;text-align: center">
+            <a-space>
+              <b>GQ Blog</b>
+              <a-divider type="vertical" />
+              <span>Copyright&nbsp;<copyright-circle-outlined />&nbsp;2022&nbsp;zgq.cool</span>
+              <a-divider type="vertical" />
+              <a href="https://beian.miit.gov.cn/">豫ICP备2021035305号-1</a>
+            </a-space>
+          </div>
         </div>
 
         <div class="a-col-right">
@@ -132,7 +140,7 @@
         <a-divider style="color:#1890ff;">账号密码登录</a-divider>
         <a-form-item
             name="username"
-            :rules="[{ required: true, message: '请输入用户名!' }]"
+            :rules="[{ required: true, message: '请输入用户名' }]"
         >
           <a-input v-model:value="formState.username" placeholder="用户名:">
             <template #prefix>
@@ -142,7 +150,7 @@
         </a-form-item>
         <a-form-item
             name="password"
-            :rules="[{ required: true, message: '请输入密码!' }]"
+            :rules="[{ required: true, message: '请输入密码' }]"
         >
           <a-input-password v-model:value="formState.password" placeholder="密码:">
             <template #prefix>
@@ -154,7 +162,7 @@
           <a-form-item name="remember" no-style>
             <a-checkbox v-model:checked="formState.isRemember">记住我</a-checkbox>
           </a-form-item>
-          <a class="login-form-forgot" href="" style="float: right" @click="doRegister()">去注册?</a>
+          <a class="login-form-forgot" href="#" style="float: right" @click="()=>{message.info('请联系管理员修改哦')}">忘记密码?</a>
         </a-form-item>
         <a-form-item>
           <a-button block type="primary" html-type="submit" @click="login()" class="login-form-button">
@@ -179,7 +187,7 @@
         <a-divider style="color:#1890ff;">昵称注册</a-divider>
         <a-form-item
             name="username"
-            :rules="[{ required: true, message: '请输入用户名!' }]"
+            :rules="[{ required: true, message: '请输入用户名' }]"
         >
           <a-input v-model:value="reg_formState.username" placeholder="昵称:" autocomplete="off">
             <template #prefix>
@@ -200,7 +208,7 @@
 
         <a-form-item
             name="checkPassword"
-            :rules="[{ required: true, message: '请确认密码!' }]"
+            :rules="[{ required: true, message: '请确认密码' }]"
         >
           <a-input-password v-model:value="reg_formState.checkPassword" placeholder="确认密码:" autocomplete="off">
             <template #prefix>
@@ -223,7 +231,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs";
 import logo from '../assets/logo.png'
-import {LockOutlined, UserOutlined} from '@ant-design/icons-vue';
+import {LockOutlined,CopyrightCircleOutlined, UserOutlined} from '@ant-design/icons-vue';
 import Carousel from "../components/Carousel.vue";
 import {message} from 'ant-design-vue';
 import {ComponentInternalInstance, getCurrentInstance, onMounted, reactive, ref, toRaw, UnwrapRef} from "vue";
@@ -300,7 +308,7 @@ const doUserInfo = (userId:number) => {
  */
 const doUserCenter = () => {
   if (!user.value) {
-    message.error("请先登录哦!")
+    message.warn("请先登录哦")
   }else {
     router.push('/user/center')
   }
@@ -346,7 +354,7 @@ const doListData = async () => {
     listData.value = articleRes.data.records;
     totalNum.value = articleRes.data.total;
   } else {
-    message.error("获取文章信息出错!")
+    message.error("获取文章信息出错")
   }
 }
 
@@ -355,18 +363,18 @@ const doListData = async () => {
  */
 const login = async () => {
   if (formState.username.length < 3 || formState.username.length > 8){
-    message.warn("昵称3~8位！")
+    message.warn("昵称3~8位")
     return;
   }
   if (formState.password.length < 4 || formState.password.length > 12){
-    message.warn("昵称4~12位！")
+    message.warn("昵称4~12位")
     return;
   }
   spinning.value = true
   const res = await myAxios.post('/user/login', formState);
   if (res.code === 0 && res.data !== null) {
     user.value = res.data
-    message.success("登录成功！");
+    message.success("登录成功");
     // 解决卡顿
     setTimeout(() => {
       //关闭模态框
@@ -383,15 +391,15 @@ const login = async () => {
 
 const register = async () => {
   if (reg_formState.username.length < 3 || reg_formState.username.length > 8){
-    message.warn("昵称3~8位！")
+    message.warn("昵称3~8位")
     return;
   }
   if (reg_formState.password.length < 4 || reg_formState.password.length > 12){
-    message.warn("昵称4~12位！")
+    message.warn("昵称4~12位")
     return;
   }
   if (reg_formState.password !== reg_formState.checkPassword){
-    message.warn("两次密码不一致！")
+    message.warn("两次密码不一致")
     return;
   }
   spinning.value = true
@@ -401,7 +409,7 @@ const register = async () => {
     checkPassword:reg_formState.checkPassword
   })
   if (res.code === 0 && res.data !== null){
-    message.success('注册成功，请登录!')
+    message.success('注册成功，请登录')
     // 清除注册表单数据
     clearRegister()
     setTimeout(() => {
@@ -425,7 +433,7 @@ const confirm = async (e: MouseEvent) => {
   const res = await myAxios.post('/user/logOut');
   if (res.code === 0 && res.data !== null) {
     user.value = null
-    message.success("退出成功！");
+    message.success("退出成功");
   } else {
     message.error(`${res.description}`);
   }
@@ -501,10 +509,12 @@ const indicator = h(LoadingOutlined, {
   background-color: white;
   box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
   margin-left: 20px;
+  border: rgb(246, 245, 245) solid 1px;
   height: 230px;
   width: 300px;
   padding: 10px;
   float: left;
+  border-radius: 4px;
 
 }
 
@@ -514,6 +524,9 @@ const indicator = h(LoadingOutlined, {
   background-color: white;
   margin-left: 39px;
   padding: 20px;
+  /*border: rgb(246, 245, 245) solid 1px;*/
+  border-radius: 4px;
+
   box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
 }
 
