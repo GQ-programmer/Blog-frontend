@@ -1,11 +1,48 @@
 <template>
-  <div style="min-width: 1540px">
-    <Carousel />
-  </div>
-  <div style="margin-top: 20px">
+
+  <div style="margin-top: 15px">
+
     <div class="user-info-container">
-<!--      <a-row>-->
-        <!-- 文章列表-->
+      <div style="min-width: 700px;width: 1000px;margin-left: 54px;">
+        <Carousel style="border-radius: 5px"/>
+      </div>
+<!--        二维码-->
+      <a-popover placement="right" style="width: 120px;">
+        <template #content style="width: 120px">
+          <img style="width: 110px;margin-left: 15px;" src="../assets/wechat.png">
+        </template>
+        <template #title>
+          <span>联系管理员</span>
+        </template>
+        <a-button shape="circle" style="
+            position: fixed;
+            top: 620px;
+            width: 45px;
+            height: 45px;
+            border:0px;
+            margin-right: 10px;"
+        >
+          <template #icon><qrcode-outlined style="font-size: 21px"/></template>
+        </a-button>
+      </a-popover>
+<!--      赏-->
+
+        <a-button shape="circle" style="
+            position: fixed;
+            top: 570px;
+            width: 45px;
+            height: 45px;
+            border:0px;
+            margin-right: 10px;"
+            @click="showShang()"
+        >
+          <template #icon>
+            <img src="../assets/shang.png"/>
+          </template>
+        </a-button>
+
+
+      <!-- 文章列表-->
         <div class="a-col-left" >
           <div>
             <a-typography-title :level="5">最近文章</a-typography-title>
@@ -70,41 +107,68 @@
         </div>
 
         <div class="a-col-right">
-          <a-popover placement="rightTop">
-            <template #content>
-              <a-typography-text type="secondary">点击头像进入个人主页</a-typography-text>
-            </template>
-            <a-col :span="24" style="text-align: center;margin-top: 10px">
-              <a-avatar @click="doUserCenter()" :size="54" v-if="!user || !user.avatarUrl">
-                <template #icon>
-                  <UserOutlined/>
-                </template>
-              </a-avatar>
-              <a-avatar @click="doUserCenter()" :size="54" v-if="user && user.avatarUrl" :src="user.avatarUrl"/>
+          <div class="a-col-right-one">
+            <a-popover placement="rightTop">
+              <template #content>
+                <a-typography-text type="secondary">点击头像进入个人主页</a-typography-text>
+              </template>
+              <a-col :span="24" style="text-align: center;margin-top: 10px">
+                <a-avatar @click="doUserCenter()" :size="54" v-if="!user || !user.avatarUrl">
+                  <template #icon>
+                    <UserOutlined/>
+                  </template>
+                </a-avatar>
+                <a-avatar @click="doUserCenter()" :size="54" v-if="user && user.avatarUrl" :src="user.avatarUrl"/>
+              </a-col>
+              <a-col :span="24" style="text-align: center;margin-top: 10px">
+                <a-typography-title :level="4">
+                  {{ user && user.username ? `${user.username}` : '未登录' }}
+                </a-typography-title>
+              </a-col>
+            </a-popover>
+            <a-col :span="24" style="text-align: center;margin-top: 15px">
+              <a-typography-text>欢迎访问,GQBlog~</a-typography-text>
             </a-col>
-            <a-col :span="24" style="text-align: center;margin-top: 10px">
-              <a-typography-title :level="4">
-                {{ user && user.username ? `${user.username}` : '未登录' }}
-              </a-typography-title>
+            <a-col :span="24" style="text-align: center;margin-top: 20px">
+              <a-button style="margin-right: 30px" type="primary" v-if="user === null" @click="showModal">点击登录</a-button>
+              <a-popconfirm
+                  placement="leftBottom"
+                  title="你确定要退出吗?&nbsp&nbsp&nbsp&nbsp"
+                  ok-text="Yes"
+                  cancel-text="No"
+                  @confirm="confirm"
+                  @cancel="cancel"
+              >
+                <a-button style="margin-right: 30px" v-if="user">退出登录</a-button>
+              </a-popconfirm>
+              <a-button type="default" @click="warning">进入后台</a-button>
             </a-col>
-          </a-popover>
-          <a-col :span="24" style="text-align: center;margin-top: 15px">
-            <a-typography-text>欢迎访问,GQBlog~</a-typography-text>
-          </a-col>
-          <a-col :span="24" style="text-align: center;margin-top: 20px">
-            <a-button style="margin-right: 30px" type="primary" v-if="user === null" @click="showModal">点击登录</a-button>
-            <a-popconfirm
-                placement="leftBottom"
-                title="你确定要退出吗?&nbsp&nbsp&nbsp&nbsp"
-                ok-text="Yes"
-                cancel-text="No"
-                @confirm="confirm"
-                @cancel="cancel"
-            >
-              <a-button style="margin-right: 30px" v-if="user">退出登录</a-button>
-            </a-popconfirm>
-            <a-button type="default" @click="warning">进入后台</a-button>
-          </a-col>
+
+          </div>
+          <div class="a-col-right-two">
+            <div>
+              <a-typography-text strong >网站更新日志</a-typography-text>
+              <a-typography-text type="secondary">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V2.2022.12.26</a-typography-text>
+              <a-divider style="margin-top: 10px"/>
+            </div>
+            <div style="margin-left: 25px">
+              <a-typography-paragraph>
+                <ul>
+                  <li>
+                    <a-typography-text >导航栏新增搜索功能</a-typography-text>
+                  </li>
+                  <li style="margin-top: 5px">
+                    <a-typography-text >导航栏新增面试文档模块</a-typography-text>
+                  </li>
+                  <li style="margin-top: 5px">
+                    <a-typography-text >主页新增联系管理员、打赏功能</a-typography-text>
+                  </li>
+
+                </ul>
+              </a-typography-paragraph>
+            </div>
+          </div>
+
         </div>
 <!--      </a-row>-->
 <!--      <div style="height: 50px"></div>-->
@@ -115,6 +179,7 @@
         </a-back-top>
       </div>
     </div>
+
   </div>
 <!--  登录模态框-->
   <a-modal v-model:visible="visible" width="500px" :maskClosable="false" :after-close="onAfterClose" :footer="null">
@@ -226,25 +291,57 @@
       </a-form>
     </div>
   </a-modal>
+
+  <a-modal
+      v-model:visible="shang_visible" width="500px"
+      :maskClosable="true"
+      :after-close="onAfterClose"
+      :footer="null"
+      :cancel="closeShang()"
+    >
+    <div style="text-align: center;font-family: 华文新魏;font-size: 20px;margin-bottom: 10px">
+      赞助站长，帮助网站走的更远~
+    </div>
+    <div style="border: 1px red ;">
+      <div v-if="mode_pay === 'wechat'" style="width: 200px;height: 260px;margin: 0 auto ">
+        <img  style="width:200px"  src="../assets/wechat-pay.jpg">
+      </div>
+      <div v-if="mode_pay === 'zhifubao'" style="width: 200px;height: 260px;margin: 0 auto ">
+        <img style="width:200px"  src="../assets/zhifubao-pay.jpg">
+      </div>
+    </div>
+    <div >
+      <div style="margin: 0 auto;width: 165px;">
+        <a-radio-group v-model:value="mode_pay" :style="{ marginBottom: '8px' }">
+        <a-radio-button value="wechat">微信支付</a-radio-button>
+        <a-radio-button value="zhifubao">支付宝</a-radio-button>
+        </a-radio-group>
+      </div>
+    </div>
+
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
 import dayjs from "dayjs";
 import logo from '../assets/logo.png'
-import {LockOutlined,CopyrightCircleOutlined, UserOutlined} from '@ant-design/icons-vue';
+import {QrcodeOutlined,CopyrightCircleOutlined, UserOutlined} from '@ant-design/icons-vue';
 import Carousel from "../components/Carousel.vue";
-import {message} from 'ant-design-vue';
+import {message, TabsProps} from 'ant-design-vue';
 import {ComponentInternalInstance, getCurrentInstance, onMounted, reactive, ref, toRaw, UnwrapRef} from "vue";
 import myAxios from "../plugins/myAxios";
 import getCurrentUser from "../plugins/user";
 import {useRouter} from "vue-router";
 import { LoadingOutlined } from '@ant-design/icons-vue';
 import { h } from 'vue';
+import Docs from "./Docs.vue";
 
+const mode_pay = ref('wechat');
 const router = useRouter()
 const top = ref<number>(10);
 const bottom = ref<number>(10);
 const visible = ref<boolean>(false);
+const shang_visible = ref<boolean>(false);
 const labelCol = {style: {width: '150px'}}
 const wrapperCol = {span: 14}
 const logAndReg = ref('login')
@@ -328,7 +425,16 @@ const doDetail = async (item) => {
   })
 }
 
+const closeShang = () => {
+  mode_pay.value = 'wechat'
+}
+
 onMounted(async () => {
+  if (window.performance.navigation.type == 1) {
+    console.log("页面被刷新")
+  }else{
+    console.log("首次被加载")
+  }
   const currentUser = await getCurrentUser()
   if (currentUser !== null) {
     user.value = currentUser
@@ -477,6 +583,9 @@ const cancel = (e: MouseEvent) => {
 const showModal = () => {
   visible.value = true;
 };
+const showShang = () => {
+  shang_visible.value = true;
+};
 
 const warning = () => {
   message.warning('暂无后台，等待后续版本');
@@ -500,34 +609,48 @@ const indicator = h(LoadingOutlined, {
 
 .user-info-container {
   margin: 0 auto;
-  width: 800px;
+  width: 1110px;
   min-width:1080px
 }
 
 
-.a-col-right {
+.a-col-right-one {
+  margin-top: 15px;
   background-color: white;
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  /*box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);*/
   margin-left: 20px;
   border: rgb(246, 245, 245) solid 1px;
   height: 230px;
   width: 300px;
   padding: 10px;
   float: left;
-  border-radius: 4px;
+  border-radius: 5px;
+
+}
+.a-col-right-two {
+  margin-top: 15px;
+  background-color: white;
+  /*box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);*/
+  margin-left: 20px;
+  border: rgb(246, 245, 245) solid 1px;
+  width: 300px;
+  padding: 10px;
+  float: left;
+  border-radius: 5px;
 
 }
 
 .a-col-left {
+  margin-top: 15px;
   width: 680px;
   float: left;
   background-color: white;
-  margin-left: 39px;
+  margin-left: 54px;
   padding: 20px;
   /*border: rgb(246, 245, 245) solid 1px;*/
-  border-radius: 4px;
+  border-radius: 5px;
 
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  /*box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);*/
 }
 
 .login-form {
@@ -575,6 +698,14 @@ const indicator = h(LoadingOutlined, {
   text-align: center;
   border-top: 0;
   border-top-color: rgba(0, 0, 0, 0.06);
+}
+:deep(.ant-carousel .slick-list) {
+    position: relative;
+    display: block;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 5px;
 }
 
 </style>

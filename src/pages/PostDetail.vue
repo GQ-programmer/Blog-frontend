@@ -233,20 +233,21 @@ function handleAnchorClick(anchor: any) {
 }
 
 .v-md-preview {
-  border-radius: 4px;
+  border-radius: 5px;
   float: left;
-  width: 650px;
+  width: 670px;
   background-color: white;
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  /*box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);*/
 }
 
 .detail-right {
   float: right;
   width: 280px;
-  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  /*box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);*/
 }
 
 .detail-right .one {
+  border-radius: 5px;
   background-color: white;
   height: 202px;
   padding: 15px;

@@ -1,12 +1,11 @@
 <template>
   <div class="container">
-
     <div class="header">
       <div style="float: left; height: 65px;padding-top: 11px">
         <img :src="logo"  style="width: 150px;margin-top: 7px" @click="()=>{router.push('/')}">
       </div>
 
-      <div style="height:65px;padding-top: 8px;float: left; margin-left: 20%;">
+      <div style="height:65px;padding-top: 8px;float: left; margin-left: 9%;">
         <a-input-search
             style="width: 345px;margin-top:10px"
             v-model:value="searchText"
@@ -26,6 +25,12 @@
               <home-outlined />
             </template>
             <router-link to="/">首页&nbsp;</router-link>
+          </a-menu-item>
+          <a-menu-item  key="docs" style="padding-top: 8px;  border-bottom: none;" >
+            <template #icon>
+              <read-outlined />
+            </template>
+            <router-link to="/docs">面试文档&nbsp;</router-link>
           </a-menu-item>
           <a-menu-item key="postEdit"  style="padding-top: 8px;" @click="doPostEdit()">
             <template #icon>
@@ -48,7 +53,7 @@
 <script lang="ts" setup>
 import logo from '../assets/logo.png'
 import {defineComponent, getCurrentInstance, onMounted, ref, toRaw, watchEffect} from 'vue';
-import { HomeOutlined, FileMarkdownOutlined,UserOutlined } from '@ant-design/icons-vue';
+import { HomeOutlined, FileMarkdownOutlined,ReadOutlined } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
 import myAxios from "../plugins/myAxios";
 import {message} from "ant-design-vue";
@@ -74,16 +79,14 @@ watchEffect(() =>{
   if (path === '/'){ //首页
     isShowSearch.value = true
     current.value = ['index'];
+  }else if (path === '/docs'){
+    isShowSearch.value = false
+    current.value = ['docs'];
   }
   else if (patt.test(path)){ //文章编辑页
     current.value = ['postEdit'];
     isShowSearch.value = false
   }
-  // else if (pattSearch.test(path)){// 搜索页
-  //   isShowSearch.value = true
-  //   // none都未选中
-  //   current.value = ['none'];
-  // }
   else { // 其他页
     // none都未选中
     current.value = ['none'];
@@ -133,6 +136,9 @@ const onSearch = () => {
 </script>
 
 <style>
+.container{
+  height: 100%;
+}
 .header{
   z-index: 999;
   /*position: fixed;*/
@@ -141,7 +147,7 @@ const onSearch = () => {
   background-color: white;
   padding: 0px 9% 0px;
   box-shadow: 0px 13px 10px -15px #1890ff;
-  min-width: 1194px;
+  min-width: 1380px;
 }
 .header-title{
   color:black;
@@ -153,6 +159,7 @@ const onSearch = () => {
 .content{
   background-color: #f6f5f5;
   width: 100%;
+  height: 100%;
   margin: 0px auto 0;
   /*padding: 10px;*/
   /*box-shadow: 0px 15px 20px -15PX black;*/
