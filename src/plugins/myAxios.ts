@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV === 'development';
 //使用axios下面的create([config])方法创建axios实例，
 // 其中config参数为axios最基本的配置信息。
 const myAxios = axios.create({
-    baseURL: isDev ? 'http://localhost:8080/api/' : 'http://zgq.cool:8082/api/', //请求后端数据的基本地址，自定义
+    baseURL: isDev ? 'http://127.0.0.1:8080/api/' : 'http://api.blog.zgq.cool/api/', //请求后端数据的基本地址，自定义
     withCredentials:true  //请求携带Cookie
 })
 

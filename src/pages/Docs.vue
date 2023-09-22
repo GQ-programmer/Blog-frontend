@@ -4,8 +4,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
-
+<script setup >
+  const arr = [];
+  for(let i=0; i< arr.length; i++){
+    const index = arr.indexOf(arr[i], i+1)
+    if(index !== -1) {
+      //
+      arr.splice(index, 1)
+      i--
+    }
+  }
 </script>
 
 <style scoped>

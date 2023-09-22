@@ -11,16 +11,16 @@
       </div>
     </template>
     <div class="bg-img">
-      <img style="width:100%;height: 400px" :src="starry_sky6">
+      <img style="width:100%;height: 170px" :src="starry_sky6">
     </div>
     <div class="bg-img">
-      <img style="width:100%;height: 400px" :src="starry_sky2">
+      <img style="width:100%;height: 170px" :src="starry_sky2">
     </div>
     <div class="bg-img">
-      <img style="width:100%;height: 400px" :src="starry_sky3">
+      <img style="width:100%;height: 170px" :src="starry_sky3">
     </div>
     <div class="bg-img">
-      <img style="width:100%;height: 400px" :src="starry_sky5">
+      <img style="width:100%;height: 170px" :src="starry_sky5">
     </div>
 
   </a-carousel>
@@ -40,27 +40,13 @@ import starry_sky6 from '../assets/starry_sky/starry-sky6.jpg'
 /* For demo */
 .ant-carousel :deep(.slick-slide) {
   text-align: center;
-  height: 400px;
+  height: 170px;
   line-height: 160px;
   background: #364d79;
   overflow: hidden;
 }
 
-.ant-carousel :deep(.slick-arrow.custom-slick-arrow) {
-  width: 25px;
-  height: 25px;
-  font-size: 25px;
-  color: #fff;
-  background-color: rgba(31, 45, 61, 0.11);
-  opacity: 0.3;
-  z-index: 1;
-}
-.ant-carousel :deep(.custom-slick-arrow:before) {
-  display: none;
-}
-.ant-carousel :deep(.custom-slick-arrow:hover) {
-  opacity: 0.5;
-}
+
 
 .ant-carousel :deep(.slick-slide h3) {
   color: #fff;
