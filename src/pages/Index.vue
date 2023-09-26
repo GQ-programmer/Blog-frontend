@@ -3,9 +3,14 @@
   <div style="margin-top: 15px">
 
     <div class="user-info-container">
-      <div style="min-width: 700px;">
-        <Carousel/>
+      <div class="category_div">
+        <div class="category_div2">
+          <a class="category_item" v-for="(item, index) in categoryList" :key="index">
+            {{item}}
+          </a>
+        </div>
       </div>
+
 <!--        二维码-->
 <!--      <a-popover placement="right" style="width: 120px;">-->
 <!--        <template #content style="width: 120px">-->
@@ -102,6 +107,9 @@
         </section>
         <section>
           <div class="a-col-right">
+            <div>
+              <a-typography-title :level="5">资讯</a-typography-title>
+            </div>
             <div class="a-col-right-item">
               <div class="a-col-right-item-title">
                 <img src="../assets/index_icon/acticle_list.png" style="height: 20px">
@@ -220,7 +228,11 @@ const pageSizeOptions = ref<string[]>(['5', '10', '15', '20']);
 const { appContext } = getCurrentInstance() as ComponentInternalInstance;
 const activeKey = ref(1);
 const user = ref()
-
+const categoryList = ref([
+    '后端','微服务','前端','Vue.js','Linux','Docker',
+    '框架源码','MySQL','Redis','消息队列',
+    '多线程'
+])//'工具类','设计模式','Python','flutter'
 
 
 
@@ -355,7 +367,7 @@ const confirm = async (e: MouseEvent) => {
 
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
 #components-popover-demo-triggerType .ant-btn {
   margin-right: 8px;
@@ -369,10 +381,10 @@ const confirm = async (e: MouseEvent) => {
 
 
 .a-col-right-item {
-  margin-top: 15px;
-  background-color: white;
-  margin-left: 20px;
-  border: rgb(246, 245, 245) solid 1px;
+  margin-bottom: 15px;
+  /*background-color: white;*/
+  background-color: rgba(255, 255, 255, 0.8);
+  /*border: rgb(246, 245, 245) solid 1px;*/
   height: 240px;
   padding: 10px;
   border-radius: 7px;
@@ -380,12 +392,11 @@ const confirm = async (e: MouseEvent) => {
 }
 .a-col-right-two {
   margin-top: 15px;
-  background-color: white;
-  margin-left: 20px;
-  border: rgb(246, 245, 245) solid 1px;
+  /*border: rgb(246, 245, 245) solid 1px;*/
   padding: 10px;
   border-radius: 7px;
-
+  background-color: rgba(255, 255, 255, 0.8);
+  /*background-color: white;*/
 }
 
 .a-col-left {
@@ -395,8 +406,9 @@ const confirm = async (e: MouseEvent) => {
   border-radius: 7px;
 }
 .a-col-right{
-  width: 280px;
-  margin-top: 45px
+  width: 265px;
+  margin-top: 15px;
+  margin-left: 15px;
 }
 
 .base-content {
@@ -431,7 +443,8 @@ const confirm = async (e: MouseEvent) => {
 }
 .ant-list-vertical .ant-list-item {
   align-items: initial;
-  background-color: white;
+  /*background-color: white;*/
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 25px;
 }
 hr {
@@ -449,5 +462,35 @@ hr {
 .ant-list-item:last-child {
   /* 样式规则适用于最后一个列表项 */
   border-radius: 0 0 7px 7px;
+}
+.category_div {
+  min-width: 700px;
+  background-color: white;
+  border-radius: 4px;
+  height:70px;
+  display: flex;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+
+  a.category_item {
+    height: 70px;
+    font-size: 16px;
+    color:black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.3s ease; /* 添加 transform 属性的过渡效果 */
+  }
+  a.category_item:hover {
+    color: #2996fa; /* 改变文本颜色 */
+    //font-size: 22px;
+    transform: scale(1.3); /* 当鼠标悬停时，放大文本 */
+  }
+}
+.category_div2 {
+  width: 95%;
+  display: grid;
+  grid-template-columns: repeat(11, 0.5fr); /* 创建6列，每列平均分配剩余空间 */
 }
 </style>

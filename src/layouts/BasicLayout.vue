@@ -1,9 +1,12 @@
 <!--      <div style="float: right;margin-left: 50px;width: 480px">-->
 <template>
   <div class="container">
+    <div class="background">
+      <img class="backgroundImage" src="../assets/background-img.png" width="932" height="331">
+    </div>
     <div class="header">
       <div >
-        <img :src="logo" style="width: 120px;" @click="()=>{router.push('/')}">
+        <img :src="logo" style="width: 145px;" @click="()=>{router.push('/')}">
       </div>
       <a-menu v-model:selectedKeys="current"  mode="horizontal" class="head-menu">
           <a-menu-item  key="index"  >
@@ -42,7 +45,6 @@
           class="header-search"
       />
       <div class="header-search" v-if="!isShowSearch"/>
-<!--      <transition name="fade">-->
         <a-button type="primary" v-show="isShowSearch" @click="showModal" style="height: 34px">登录
           <a-divider type="vertical" style="border-color: white" />
           注册
@@ -51,7 +53,6 @@
           <a-avatar size="large" src="https://zgq-icu-2002-1313043931.cos.ap-shanghai.myqcloud.com/mynotes/avatar-boy.png">
           </a-avatar>
         </div>
-<!--      </transition>-->
     </div>
 
     <div class="content">
@@ -60,7 +61,7 @@
     <div class="footer">
       <div class="footer-item">
         <a-space>
-          <span>S D K P</span>
+          <span>GQBlog</span>
           <a-divider type="vertical" />
           <span>Copyright&nbsp;<copyright-circle-outlined />&nbsp;2022&nbsp;zgq.cool</span>
           <a-divider type="vertical" />
@@ -136,7 +137,7 @@
         <div class="form-item-end">
           其它登录:
           <span @click="loginForQQ()">
-            <img style="height: 25px;" src="src/assets/index_icon/qq_icon.png">
+            <img style="height: 25px;" :src="qq_icon">
             QQ
           </span>
         </div>
@@ -199,7 +200,11 @@
 
 </template>
 <script lang="ts"  setup>
-import logo from '../assets/sdkp-logo.png'
+// import logo from '../assets/sdkp-logo.png'
+// import logo from '../assets/logo.png'
+import backgroundImg from '../assets/background-img.png'
+import logo from '../assets/GQBlog.png'
+import qq_icon from '../assets/index_icon/qq_icon.png'
 import {defineComponent, getCurrentInstance, h, onMounted, reactive, ref, toRaw, UnwrapRef, watchEffect} from 'vue';
 import {
   HomeOutlined,
@@ -496,17 +501,56 @@ const loginForQQ = () => {
 
 </script>
 
-<style lang="less" >
-//.container{
-//  height: 100%;
-//}
+<style lang="less" scoped>
+.container{
+
+  .background {
+    width: 100vw;
+    height: 980px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background: linear-gradient(0deg,rgba(255, 255, 255, 0) 20%,rgba(30,128,255,.2));
+
+    .backgroundImage {
+      position: absolute;
+      right: 0;
+      top: 213px;
+    }
+  }
+}
 
 .header{
   display: flex;
   justify-content: center; /* 在主轴上水平居中 */
   align-items: center; /* 在交叉轴上垂直居中 */
   gap: 80px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+
+  // 导航栏组件透明度
+  /deep/.ant-menu {
+    background-color: rgba(24, 144, 255, 0.2) !important;
+    .ant-menu-title-content {
+      background-color: rgba(0, 0, 0, 0) !important;
+    }
+  }
+  /deep/.ant-menu-item {
+    line-height: 65px;
+    background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+  }
+  /deep/.ant-menu-title-content {
+    transition: color 0.3s;
+    font-size: 15px;
+    font-family:  微软雅黑  ;
+    background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+
+  }
+}
+ //搜索框透明度
+/deep/ .ant-input-group .ant-input {
+  background-color: rgba(0, 0, 0, 0) !important;
+
 }
 .login-form {
   display: flex;
@@ -516,14 +560,6 @@ const loginForQQ = () => {
   width: 300px !important;
   //margin-left: 100px;
   transition: opacity 0.3s ease;
-}
-.ant-menu-item {
-  line-height: 65px;
-}
-.ant-menu-title-content {
-  transition: color 0.3s;
-  font-size: 15px;
-  font-family:  微软雅黑  ;
 }
 .header-title{
   color:black;
