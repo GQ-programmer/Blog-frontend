@@ -382,8 +382,8 @@ const confirm = async (e: MouseEvent) => {
 
 .a-col-right-item {
   margin-bottom: 15px;
-  /*background-color: white;*/
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: white;
+  //background-color: rgba(255, 255, 255, 0.8);
   /*border: rgb(246, 245, 245) solid 1px;*/
   height: 240px;
   padding: 10px;
@@ -395,8 +395,8 @@ const confirm = async (e: MouseEvent) => {
   /*border: rgb(246, 245, 245) solid 1px;*/
   padding: 10px;
   border-radius: 7px;
-  background-color: rgba(255, 255, 255, 0.8);
-  /*background-color: white;*/
+  //background-color: rgba(255, 255, 255, 0.8);
+  background-color: white;
 }
 
 .a-col-left {
@@ -443,8 +443,8 @@ const confirm = async (e: MouseEvent) => {
 }
 .ant-list-vertical .ant-list-item {
   align-items: initial;
-  /*background-color: white;*/
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: white;
+  //background-color: rgba(255, 255, 255, 0.8);
   padding: 25px;
 }
 hr {
@@ -470,7 +470,7 @@ hr {
   height:70px;
   display: flex;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  //background-color: rgba(255, 255, 255, 0.8);
 
   a.category_item {
     height: 70px;

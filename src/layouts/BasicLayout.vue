@@ -526,7 +526,7 @@ const loginForQQ = () => {
   justify-content: center; /* 在主轴上水平居中 */
   align-items: center; /* 在交叉轴上垂直居中 */
   gap: 80px;
-  background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+  background-color: rgba(255, 255, 255, 1); /* 50% 透明度的白色背景 */
 
   // 导航栏组件透明度
   /deep/.ant-menu {
@@ -537,13 +537,13 @@ const loginForQQ = () => {
   }
   /deep/.ant-menu-item {
     line-height: 65px;
-    background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+    background-color: rgba(255, 255, 255, 1); /* 50% 透明度的白色背景 */
   }
   /deep/.ant-menu-title-content {
     transition: color 0.3s;
     font-size: 15px;
     font-family:  微软雅黑  ;
-    background-color: rgba(255, 255, 255, 0.8); /* 50% 透明度的白色背景 */
+    background-color: rgba(255, 255, 255, 1); /* 50% 透明度的白色背景 */
 
   }
 }
