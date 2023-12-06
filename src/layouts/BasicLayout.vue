@@ -1,9 +1,6 @@
 <!--      <div style="float: right;margin-left: 50px;width: 480px">-->
 <template>
   <div class="container">
-    <div class="background">
-      <img class="backgroundImage" src="../assets/background-img.png" width="932" height="331">
-    </div>
     <div class="header">
       <div >
         <img :src="logo" style="width: 145px;" @click="()=>{router.push('/')}">
@@ -45,14 +42,23 @@
           class="header-search"
       />
       <div class="header-search" v-if="!isShowSearch"/>
-        <a-button type="primary" v-show="isShowSearch" @click="showModal" style="height: 34px">登录
+        <a-button type="primary" v-if="!user" @click="showModal" style="height: 34px">登录
           <a-divider type="vertical" style="border-color: white" />
           注册
         </a-button>
-        <div style="width: 122px;user-select: none  " v-show="!isShowSearch">
-          <a-avatar size="large" src="https://zgq-icu-2002-1313043931.cos.ap-shanghai.myqcloud.com/mynotes/avatar-boy.png">
-          </a-avatar>
+        <div  v-if="user">
+          <a-dropdown placement="bottom">
+            <a-avatar size="large" :src="user.avatarUrl"/>
+            <template #overlay>
+              <a-menu>
+                <a-menu-item key="1"><span style="margin: 0px 10px 0px 10px" @click="doUserInfo(user.id)">个人中心</span></a-menu-item>
+                <a-menu-item key="2"><span style="margin: 0px 10px 0px 10px" @click="logOut">退出登录</span></a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
         </div>
+
+
     </div>
 
     <div class="content">
@@ -81,7 +87,7 @@
   </div>
 
   <!--  登录模态框-->
-  <a-modal v-model:visible="visible" width="500px" :maskClosable="false" :after-close="onAfterClose" :footer="null">
+  <a-modal v-model:visible="visible" width="400px" :maskClosable="false" :after-close="onAfterClose" :footer="null">
 
     <div style="text-align: center;margin-top: 24px">
       <div style="margin-bottom: 20px;">
@@ -124,9 +130,8 @@
         </a-form-item>
         <div class="form-item-end">
           <a-form-item name="remember" no-style>
-            <a-checkbox v-model:checked="formState.isRemember">记住我</a-checkbox>
+            <a class="login-form-forgot" href="#" style="float: right" @click="()=>{message.info('请联系管理员修改哦')}">忘记密码?</a>
           </a-form-item>
-          <a class="login-form-forgot" href="#" style="float: right" @click="()=>{message.info('请联系管理员修改哦')}">忘记密码?</a>
         </div>
         <div class="form-item-end">
           <a-button block type="primary" html-type="submit" @click="login()" class="login-form-button">
@@ -134,13 +139,13 @@
             <a-spin :indicator="indicator" :spinning="spinning" />
           </a-button>
         </div>
-        <div class="form-item-end">
-          其它登录:
-          <span @click="loginForQQ()">
-            <img style="height: 25px;" :src="qq_icon">
-            QQ
-          </span>
-        </div>
+<!--        <div class="form-item-end">-->
+<!--          其它登录:-->
+<!--          <span @click="loginForQQ()">-->
+<!--            <img style="height: 25px;" :src="qq_icon">-->
+<!--            QQ-->
+<!--          </span>-->
+<!--        </div>-->
       </a-form>
     </div>
     <div v-show="logAndReg === 'register'" class="login-form">
@@ -202,20 +207,30 @@
 <script lang="ts"  setup>
 // import logo from '../assets/sdkp-logo.png'
 // import logo from '../assets/logo.png'
-import backgroundImg from '../assets/background-img.png'
 import logo from '../assets/GQBlog.png'
 import qq_icon from '../assets/index_icon/qq_icon.png'
-import {defineComponent, getCurrentInstance, h, onMounted, reactive, ref, toRaw, UnwrapRef, watchEffect} from 'vue';
+import {
+  createVNode,
+  defineComponent,
+  getCurrentInstance,
+  h,
+  onMounted,
+  reactive,
+  ref,
+  toRaw,
+  UnwrapRef,
+  watchEffect
+} from 'vue';
 import {
   HomeOutlined,
   FileMarkdownOutlined,
   ReadOutlined,
   UserSwitchOutlined,
-  LoadingOutlined
+  LoadingOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons-vue';
 import {useRoute, useRouter} from "vue-router";
 import myAxios from "../plugins/myAxios";
-import {message} from "ant-design-vue";
+import {Button, message, Modal, notification, NotificationPlacement} from "ant-design-vue";
 import getCurrentUser from "../plugins/user";
 import SearchPage from "../pages/SearchPage.vue";
 const router = useRouter()
@@ -268,16 +283,75 @@ const current = ref<string[]>(['index']);
 
 const showSearch = (data:Boolean) => {
   if (data === true) {
-
         isShowSearch.value = true;
-
-
   }else {
-
         isShowSearch.value = false;
-
   }
 }
+
+onMounted(async () => {
+  const previousRoute =  localStorage.getItem('previousRoute')
+  console.log('previousRoute' + previousRoute);
+  const currentUser = await getCurrentUser()
+  if (currentUser !== null) {
+    user.value = currentUser
+    // message.success("获取用户信息成功");
+  } else {
+    user.value = null
+    if (previousRoute === '/') {
+      // 刷新时调用
+      openNotification('')
+    }
+  }
+
+})
+/**
+ * 进入用户详情页
+ * @param userId
+ */
+const doUserInfo = (userId:number) => {
+  router.push({
+    name:'UserInfo',
+    params:{
+      userId:userId
+    }
+  })
+}
+
+const openNotification = (placement: NotificationPlacement) => {
+  const key = `open${Date.now()}`;
+  notification.open({
+    message: ()=>h('div',
+        {style: 'font-weight: bold; font-size: 17px'},
+        '登录即可发布文章和面试文档查看'),
+    description: ()=>h('div',
+        {style: 'color:black;'},
+        '超 5 千万创作者的学习心得、深度文章和面试文档尽在GQBlog。'),
+    placement,
+    duration: 0,
+    btn: () =>
+        h(
+            Button,
+            {
+              type: 'primary',
+              size: 'block',
+              style: 'width: 100%',
+              onClick: () => {
+                notification.close(key)
+                showModal()
+              }
+            },
+            { default: () => '立即登录/注册' },
+        ),
+    style: {
+      width: '350px',
+    },
+    key,
+    onClose: close,
+  });
+};
+
+
 /**
  * 根据路由 展示导航item active状态
  *
@@ -313,6 +387,10 @@ watchEffect(() =>{
 const doChatGPT = async () => {
   current.value = ['chatGPT']
   router.push('/chatGPT');
+}
+const doDiary = async () => {
+  current.value = ['chatGPT']
+  router.push('/diary');
 }
 
 const doDoc = async () => {
@@ -371,6 +449,18 @@ const onSearch = () => {
   })
   searchText.value = ''
   // message.warn("暂未实现，等待后续版本!")
+}
+const clearLogin = () => {
+  // 清空登录表单值
+  formState.isRemember = false;
+  formState.username = '';
+  formState.password = '';
+}
+const clearRegister = () => {
+  // 清空注册表单值
+  reg_formState.username = ''
+  reg_formState.password = ''
+  reg_formState.checkPassword = ''
 }
 
 /**
@@ -441,18 +531,31 @@ const register = async () => {
   }
 }
 
-const clearLogin = () => {
-  // 清空登录表单值
-  formState.isRemember = false;
-  formState.username = '';
-  formState.password = '';
+/**
+ * 退出登录
+ * @param e
+ */
+const logOut = async (e: MouseEvent) => {
+  console.log(e);
+  Modal.confirm({
+    title: '确认退出登录吗?',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '',
+    async onOk() {
+      const res = await myAxios.post('/user/logOut');
+      if (res.code === 0 && res.data !== null) {
+        user.value = null
+        message.success("退出成功");
+      } else {
+        message.error(`${res.description}`);
+      }
+    },
+    onCancel() {},
+    class: 'test',
+  });
 }
-const clearRegister = () => {
-  // 清空注册表单值
-  reg_formState.username = ''
-  reg_formState.password = ''
-  reg_formState.checkPassword = ''
-}
+
+
 
 const onAfterClose = () => {
   // 清除表单校验
@@ -495,37 +598,19 @@ const indicator = h(LoadingOutlined, {
   spin: true,
 });
 
-const loginForQQ = () => {
-
-}
 
 </script>
 
 <style lang="less" scoped>
 .container{
-
-  .background {
-    width: 100vw;
-    height: 980px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    background: linear-gradient(0deg,rgba(255, 255, 255, 0) 20%,rgba(30,128,255,.2));
-
-    .backgroundImage {
-      position: absolute;
-      right: 0;
-      top: 213px;
-    }
-  }
+  background-color: #f2f3f5;
 }
 
 .header{
   display: flex;
   justify-content: center; /* 在主轴上水平居中 */
   align-items: center; /* 在交叉轴上垂直居中 */
-  gap: 80px;
+  gap: 60px;
   background-color: rgba(255, 255, 255, 1); /* 50% 透明度的白色背景 */
 
   // 导航栏组件透明度
@@ -536,7 +621,7 @@ const loginForQQ = () => {
     }
   }
   /deep/.ant-menu-item {
-    line-height: 65px;
+    line-height: 55px;
     background-color: rgba(255, 255, 255, 1); /* 50% 透明度的白色背景 */
   }
   /deep/.ant-menu-title-content {
@@ -584,5 +669,7 @@ const loginForQQ = () => {
 .form-item-end{
   margin-bottom: 15px;
 }
-
+.login-form-button {
+  margin-top: 10px;
+}
 </style>

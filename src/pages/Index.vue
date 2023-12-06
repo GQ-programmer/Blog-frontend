@@ -5,12 +5,18 @@
     <div class="user-info-container">
       <div class="category_div">
         <div class="category_div2">
-          <a class="category_item" v-for="(item, index) in categoryList" :key="index">
-            {{item}}
+          <a class="category_item"
+             v-for="(item, index) in articleCategoryList"
+             :key="index"
+             :class="{'category_item_active': articleCategoryId === item.id}"
+             style="caret-color: rgba(0, 0, 0, 0);"
+             @click="listByCategoryId(item.id)">
+            {{item.name}}
           </a>
         </div>
       </div>
 
+<!--      region-->
 <!--        二维码-->
 <!--      <a-popover placement="right" style="width: 120px;">-->
 <!--        <template #content style="width: 120px">-->
@@ -46,6 +52,7 @@
 <!--          </template>-->
 <!--        </a-button>-->
 
+<!-- endregion-->
 
       <div class="base-content">
         <!-- 文章列表-->
@@ -62,6 +69,7 @@
                     发布时间：{{
                       dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')
                     }}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分类名称：{{item.articleCategoryName}}
                   </template>
                   <template #extra>
                     <img
@@ -228,49 +236,32 @@ const pageSizeOptions = ref<string[]>(['5', '10', '15', '20']);
 const { appContext } = getCurrentInstance() as ComponentInternalInstance;
 const activeKey = ref(1);
 const user = ref()
-const categoryList = ref([
+const articleCategoryId = ref(0);
+const articleCategoryList = ref([
     '后端','微服务','前端','Vue.js','Linux','Docker',
     '框架源码','MySQL','Redis','消息队列',
     '多线程'
 ])//'工具类','设计模式','Python','flutter'
 
+/**
+ * 获取文章分类
+ */
+const getArticleCategoryList = async () => {
+  // 重新编辑文章
+  const res = await myAxios.get('/articleCategory/list')
+  if (res.code === 0 && res.data !== null) {
+    articleCategoryList.value = res.data
+  }
+}
 
-
-const openNotification = (placement: NotificationPlacement) => {
-  const key = `open${Date.now()}`;
-  notification.open({
-    message: ()=>h('div',
-        {style: 'font-weight: bold; font-size: 17px'},
-        '登录即可发布文章和面试文档查看'),
-    description: ()=>h('div',
-        {style: 'color:black;'},
-        '超 5 千万创作者的学习心得、深度文章和面试文档尽在GQBlog。'),
-    placement,
-    duration: 0,
-    btn: () =>
-        h(
-            Button,
-            {
-              type: 'primary',
-              size: 'block',
-              style: 'width: 100%',
-              onClick: () => {
-                notification.close(key)
-                // showModal()
-              }
-            },
-            { default: () => '立即登录/注册' },
-        ),
-        style: {
-          width: '350px',
-        },
-        key,
-        onClose: close,
-  });
-};
-
-
-
+/**
+ * 按分类搜索
+ * @param id
+ */
+const listByCategoryId = (id:number)=> {
+  articleCategoryId.value = id
+  doListData();
+}
 /**
  * 进入用户详情页
  * @param userId
@@ -313,20 +304,16 @@ const closeShang = () => {
 }
 
 onMounted(async () => {
-  const previousRoute =  localStorage.getItem('previousRoute')
   const currentUser = await getCurrentUser()
   if (currentUser !== null) {
     user.value = currentUser
     // message.success("获取用户信息成功");
   } else {
     user.value = null
-    if (previousRoute === '/') {
-      // 刷新时调用
-      openNotification('')
-    }
+
   }
   await doListData();
-
+  await getArticleCategoryList();
 })
 
 /**
@@ -335,6 +322,7 @@ onMounted(async () => {
 const doListData = async () => {
   const articleRes = await myAxios.get('/article/listPage',{
     params:{
+      articleCategoryId:articleCategoryId.value,
       currentPageNum:currentPageNum.value,
       pageSize:pageSize.value
     }
@@ -467,13 +455,13 @@ hr {
   min-width: 700px;
   background-color: white;
   border-radius: 4px;
-  height:70px;
+  height:60px;
   display: flex;
   justify-content: center;
+  padding: 0px 48px;
   //background-color: rgba(255, 255, 255, 0.8);
-
   a.category_item {
-    height: 70px;
+    height: 60px;
     font-size: 16px;
     color:black;
     display: flex;
@@ -487,10 +475,16 @@ hr {
     //font-size: 22px;
     transform: scale(1.3); /* 当鼠标悬停时，放大文本 */
   }
+  a.category_item_active {
+    color: #2996fa; /* 改变文本颜色 */
+    transform: scale(1.3); /* 当鼠标悬停时，放大文本 */
+  }
 }
+
 .category_div2 {
-  width: 95%;
-  display: grid;
-  grid-template-columns: repeat(11, 0.5fr); /* 创建6列，每列平均分配剩余空间 */
+  width: 100%;
+  display: flex;
+  gap: 45px;
+  //grid-template-columns: repeat(12, 0.5fr); /* 创建6列，每列平均分配剩余空间 */
 }
 </style>

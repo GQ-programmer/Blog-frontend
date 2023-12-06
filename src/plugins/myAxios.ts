@@ -1,12 +1,11 @@
 import axios from 'axios'
 import * as process from "process";
-
-const isDev = process.env.NODE_ENV === 'development';
+import {baseURL} from "../config/constant";
 
 //使用axios下面的create([config])方法创建axios实例，
 // 其中config参数为axios最基本的配置信息。
 const myAxios = axios.create({
-    baseURL: isDev ? 'http://127.0.0.1:8080/' : 'http://api.blog.zgq.cool/', //请求后端数据的基本地址，自定义
+    baseURL: baseURL, //请求后端数据的基本地址，自定义
     withCredentials:true  //请求携带Cookie
 })
 

@@ -7,7 +7,7 @@
             <div class="confirm">
             <div class="c-card">
               <a-card title="GQ-AI 助手" :bordered="false" style="width: 100%">
-                <div style="height: 80%">
+                <div style="">
                   <a-typography-title :level="5" style="margin-bottom: 10px">问题：{{mes}}</a-typography-title>
                   <v-md-preview :text="content" ref="preview"></v-md-preview>
                 </div>
@@ -69,7 +69,7 @@ const onSearch = async () => {
 
 <style scoped>
 .i_container{
-  height: 100%;
+  width: 1200px;
 }
 .main{
   width: 60%;
@@ -80,15 +80,16 @@ const onSearch = async () => {
   height: 90%;
 }
 .confirm{
-  height: 90%;
   margin-top: 30px;
   background: white;
   /*border: red 1px solid;*/
   position: relative;
+  height: 73vh;
 }
 .c-card{
   background: white;
-  padding: 0px
+  padding: 0px;
+
 }
 .c-input{
   width: 100%;
@@ -97,10 +98,11 @@ const onSearch = async () => {
   /*border: 1px red solid;*/
   height: 120px;
   /*position: absolute; !* 设置子元素为绝对定位 *!*/
-  /*bottom: 0; !* bottom 设置为 0，即固定在父元素的底部 *!*/
+  /*bottom: 10px; !* bottom 设置为 0，即固定在父元素的底部 *!*/
 
 }
 iframe {
   border-width: 0px;
 }
 </style>
+

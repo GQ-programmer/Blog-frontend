@@ -27,7 +27,8 @@
                   padding-top: 10px;
                   margin-right: -19px;
             ">
-            文章标题：<span style="color:#1890ff;">{{articleVo.title}}</span>
+            文章标题：<span style="color:#1890ff;margin-right: 20px;">{{articleVo.title}}</span>
+            文章分类：<span style="color:#1890ff;">{{articleVo.articleCategoryName}}</span>
           </div>
         </div>
         <!-- 文章主体 -->

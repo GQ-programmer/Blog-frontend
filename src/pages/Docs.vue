@@ -18,7 +18,8 @@
 
 <style scoped>
 .i_container{
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
 }
 .frame{
   width: 100%;

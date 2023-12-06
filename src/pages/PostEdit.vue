@@ -75,7 +75,16 @@
         >
           <a-textarea v-model:value="formState.description" style="height: 100px" placeholder="摘要(必填):会在推荐、列表场景外露，帮助快速了解内容(需超过10字)"/>
         </a-form-item>
-
+        <a-form-item
+            name="articleCategoryId"
+            label="分类"
+            has-feedback
+            :rules="[{ required: true, message: '请选择分类' }]"
+        >
+          <a-select v-model:value="formState.articleCategoryId" placeholder="请选择分类">
+            <a-select-option :value="item.id" v-for="(item, index) in articleCategoryList" :key="index">{{item.name}}</a-select-option>
+          </a-select>
+        </a-form-item>
         <a-form-item
             name="coverUrl"
             label="上传文章封面"
@@ -150,10 +159,11 @@ const user = ref({})
 const text = ref('')
 const isReEdit = ref(false)
 const articleId = ref(0)
-
+const articleCategoryList = ref([])
 const formState = reactive({
   title: '',
   description: '',
+  articleCategoryId: 0
 });
 
 
@@ -180,6 +190,7 @@ onMounted(async ()=> {
         text.value = article.content
         formState.title = article.title
         formState.description = article.description
+        formState.articleCategoryId = article.articleCategoryId
         imageUrl.value = article.coverUrl
         isReEdit.value = true
       }
@@ -191,6 +202,21 @@ const back = () => {
   router.back();
 }
 
+/**
+ * 获取文章分类
+ */
+const getArticleCategoryList = async () => {
+  // 重新编辑文章
+  const res = await myAxios.get('/articleCategory/list')
+  if (res.code === 0 && res.data !== null) {
+    let itemWithoutIdZero = res.data.filter(item => item.id !== 0);
+    articleCategoryList.value = itemWithoutIdZero
+    if (formState.articleCategoryId === 0) {
+      // 新增文章，默认选中列表第一个分类
+      formState.articleCategoryId = itemWithoutIdZero[0].id
+    }
+  }
+}
 /**
  * 文章编辑器上传本地文件到服务器COS
  * @param event
@@ -248,6 +274,7 @@ const openNotification = (placement: NotificationPlacement) => {
 
 const showModal = () => {
   visible.value = true;
+  getArticleCategoryList();
 };
 
 /**
@@ -274,6 +301,7 @@ const showConfirm = (title:string) => {
       text.value = '';
       formState.title = '';
       formState.description = '';
+      formState.articleCategoryId = 0;
       imageUrl.value = '';
       router.replace({
         name:"PostEdit",
@@ -314,6 +342,7 @@ const doPublish = async () => {
       id: articleId.value,
       title: formState.title,
       description: formState.description,
+      articleCategoryId: formState.articleCategoryId,
       coverUrl: imageUrl.value,
       content: text.value
     })
@@ -329,6 +358,7 @@ const doPublish = async () => {
     const res = await myAxios.post('/article/add', {
       title: formState.title,
       description: formState.description,
+      articleCategoryId: formState.articleCategoryId,
       coverUrl: imageUrl.value,
       content: text.value
     })
